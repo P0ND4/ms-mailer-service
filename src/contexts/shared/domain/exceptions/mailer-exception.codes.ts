@@ -122,4 +122,16 @@ export const FoodaExceptionCodes = {
     `${SERVICE_PREFIX}-1023`,
     'Cada destinatario de recipients debe tener formato telefonico internacional E.164',
   ),
+  Ex1024: new FoodaExceptionInfo(
+    `${SERVICE_PREFIX}-1024`,
+    'ttlSeconds tiene que ser un numero entero',
+  ),
+  Ex1025: new FoodaExceptionInfo(
+    `${SERVICE_PREFIX}-1025`,
+    'ttlSeconds debe ser mayor o igual a 30 segundos',
+  ),
+  Ex1026: new FoodaExceptionInfo(
+    `${SERVICE_PREFIX}-1026`,
+    'ttlSeconds debe ser menor o igual a 1800 segundos',
+  ),
 };

@@ -1,21 +1,32 @@
 import { Injectable } from '@nestjs/common';
 import { ICodeUseCase } from '../../domain/use-cases/mailer/code.use-case.interface';
+import { IMailerRepository } from 'src/contexts/shared/domain/repositories/mailer.repository.interface';
 
 @Injectable()
 export class CodeUseCase implements ICodeUseCase {
-  generateCode(length: number): string {
-    const safeLength = Math.max(0, length);
+  constructor(private readonly mailerRepository: IMailerRepository) {}
+
+  async generateCode(
+    length: number,
+    hash: string,
+    ttlSeconds: number = 300,
+  ): Promise<string> {
+    const safeLength = Math.max(4, Math.min(12, length));
     const code = Array.from({ length: safeLength }, () =>
       Math.floor(Math.random() * 10),
     ).join('');
 
-    console.log('[CodeUseCase] generateCode', { length, code });
+    await this.mailerRepository.saveVerificationCode(hash, code, ttlSeconds);
+
     return code;
   }
 
-  validateCode(code: string, hash: string): boolean {
-    const isValid = code === hash;
-    console.log('[CodeUseCase] validateCode', { code, hash, isValid });
+  async validateCode(code: string, hash: string): Promise<boolean> {
+    const storedCode = await this.mailerRepository.getVerificationCode(hash);
+    const isValid = storedCode === code;
+
+    if (isValid) await this.mailerRepository.deleteVerificationCode(hash);
+
     return isValid;
   }
 }

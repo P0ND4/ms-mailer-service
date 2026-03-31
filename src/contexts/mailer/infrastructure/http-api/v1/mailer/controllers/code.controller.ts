@@ -26,12 +26,15 @@ export class CodeController {
   })
   @ApiBody({
     type: GenerateCodeDto,
-    description: 'Configura la longitud del codigo numerico a generar.',
+    description:
+      'Configura la longitud, hash de referencia y ttl para guardar el codigo en Redis.',
     examples: {
       otp6: {
-        summary: 'Generar OTP de 6 digitos',
+        summary: 'Generar OTP de 6 digitos y guardarlo',
         value: {
+          hash: 'otp-login-user-123',
           length: 6,
+          ttlSeconds: 300,
         },
       },
     },
@@ -41,14 +44,21 @@ export class CodeController {
   })
   @ApiBadRequestResponse({
     description:
-      'Payload invalido. Posibles codigos: ML-1014, ML-1015, ML-1016.',
+      'Payload invalido. Posibles codigos: ML-1014, ML-1015, ML-1016, ML-1019, ML-1020, ML-1024, ML-1025, ML-1026.',
   })
-  generateCode(@Body() body: GenerateCodeDto) {
-    const code = this.codeService.generateCode(body.length);
+  async generateCode(@Body() body: GenerateCodeDto) {
+    const ttlSeconds = body.ttlSeconds ?? 300;
+    const code = await this.codeService.generateCode(
+      body.length,
+      body.hash,
+      ttlSeconds,
+    );
 
     return {
+      hash: body.hash,
       code,
       length: body.length,
+      ttlSeconds,
     };
   }
 
@@ -87,8 +97,8 @@ export class CodeController {
     description:
       'Payload invalido. Posibles codigos: ML-1017, ML-1018, ML-1019, ML-1020.',
   })
-  validateCode(@Body() body: ValidateCodeDto) {
-    const valid = this.codeService.validateCode(body.code, body.hash);
+  async validateCode(@Body() body: ValidateCodeDto) {
+    const valid = await this.codeService.validateCode(body.code, body.hash);
     return {
       valid,
     };

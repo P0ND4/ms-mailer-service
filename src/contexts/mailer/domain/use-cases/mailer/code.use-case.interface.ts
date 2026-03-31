@@ -1,4 +1,8 @@
 export abstract class ICodeUseCase {
-  abstract generateCode(length: number): string;
-  abstract validateCode(code: string, hash: string): boolean;
+  abstract generateCode(
+    length: number,
+    hash: string,
+    ttlSeconds?: number,
+  ): Promise<string>;
+  abstract validateCode(code: string, hash: string): Promise<boolean>;
 }

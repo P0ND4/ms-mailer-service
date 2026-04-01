@@ -36,8 +36,10 @@ export class EmailChannelProvider {
       text: payload.options?.text ?? payload.body,
     };
 
+    const transporter = this.getTransporter();
+
     try {
-      const info = await this.getTransporter().sendMail(mailOptions);
+      const info = await transporter.sendMail(mailOptions);
       this.logger.log(
         `Email delivered. to=${payload.to} messageId=${info.messageId}`,
       );

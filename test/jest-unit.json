@@ -1,0 +1,33 @@
+{
+  "moduleFileExtensions": ["js", "json", "ts"],
+  "rootDir": "..",
+  "testEnvironment": "node",
+  "testRegex": "test/unit/.*\\.spec\\.ts$",
+  "transform": {
+    "^.+\\.(t|j)s$": "ts-jest"
+  },
+  "setupFilesAfterEnv": ["<rootDir>/test/unit/setup.ts"],
+  "moduleNameMapper": {
+    "^src/(.*)$": "<rootDir>/src/$1"
+  },
+  "collectCoverageFrom": [
+    "src/**/*.ts",
+    "!src/main.ts",
+    "!src/**/index.ts",
+    "!src/**/route.constants.ts",
+    "!src/app/app.module.ts",
+    "!src/database/redis.module.ts",
+    "!src/contexts/**/mailer.module.ts",
+    "!src/contexts/shared/shared.module.ts",
+    "!src/contexts/mailer/domain/**/*.ts",
+    "!src/contexts/shared/api.response.ts"
+  ],
+  "coverageThreshold": {
+    "global": {
+      "branches": 80,
+      "functions": 80,
+      "lines": 80,
+      "statements": 80
+    }
+  }
+}

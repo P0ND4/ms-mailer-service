@@ -30,8 +30,10 @@ export class TwilioChannelProvider {
       );
     }
 
+    const client = this.getClient();
+
     try {
-      const message = await this.getClient().messages.create({
+      const message = await client.messages.create({
         to: payload.to,
         body: payload.message,
         from,
@@ -77,8 +79,10 @@ export class TwilioChannelProvider {
       );
     }
 
+    const client = this.getClient();
+
     try {
-      const message = await this.getClient().messages.create({
+      const message = await client.messages.create({
         to: this.toWhatsAppAddress(payload.to),
         body: payload.message,
         from,
@@ -127,8 +131,10 @@ export class TwilioChannelProvider {
     const voiceUrl =
       payload.options?.voiceUrl ?? this.getConfigValue('TWILIO_VOICE_URL');
 
+    const client = this.getClient();
+
     try {
-      const call = await this.getClient().calls.create({
+      const call = await client.calls.create({
         to: payload.to,
         from,
         statusCallback,

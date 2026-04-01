@@ -73,7 +73,3 @@ Politica de puertos:
 ## Documentacion operativa
 Para procedimientos detallados de despliegue, troubleshooting, personalizacion y checklist:
 - [docs/OPERACION_PROYECTO.md](docs/OPERACION_PROYECTO.md)
-
-## Ejemplos de uso API
-Para payloads completos por endpoint (email, SMS, WhatsApp, voz y OTP):
-- [docs/api-examples.md](docs/api-examples.md)

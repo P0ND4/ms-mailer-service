@@ -9,6 +9,9 @@ Microservicio de mensajeria basado en NestJS para envio de correo, SMS, WhatsApp
 - Envio individual y masivo por llamada de voz.
 - Generacion y validacion de OTP con reglas de seguridad (rate limit e intentos maximos).
 
+## Endpoints
+<img width="1444" height="706" alt="image" src="https://github.com/user-attachments/assets/55b44870-5e9b-4f84-b34a-937f196bba72" />
+
 ## Stack
 - NestJS
 - BullMQ

@@ -1,6 +1,13 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, Matches } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import {
+  IsNotEmpty,
+  IsObject,
+  IsOptional,
+  IsString,
+  Matches,
+} from 'class-validator';
 import { FoodaExceptionCodes } from 'src/contexts/shared/domain/exceptions/mailer-exception.codes';
+import type { PhoneDeliveryOptions } from 'src/contexts/mailer/domain/types/delivery-options.type';
 
 export class SendPhoneMessageDto {
   @ApiProperty({
@@ -22,4 +29,16 @@ export class SendPhoneMessageDto {
   @IsString({ message: FoodaExceptionCodes.Ex1011.message })
   @IsNotEmpty({ message: FoodaExceptionCodes.Ex1012.message })
   message!: string;
+
+  @ApiPropertyOptional({
+    example: {
+      messagingServiceSid: 'MGXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+      statusCallback: 'https://api.midominio.com/twilio/status',
+    },
+    description:
+      'Opciones avanzadas para personalizar el envio por Twilio (from, callback, SID, etc).',
+  })
+  @IsOptional()
+  @IsObject({ message: FoodaExceptionCodes.Ex1027.message })
+  options?: PhoneDeliveryOptions;
 }

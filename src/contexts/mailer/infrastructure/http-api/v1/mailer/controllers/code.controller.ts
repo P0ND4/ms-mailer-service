@@ -5,6 +5,7 @@ import {
   ApiOkResponse,
   ApiOperation,
   ApiTags,
+  ApiTooManyRequestsResponse,
 } from '@nestjs/swagger';
 import { V1_MAILER } from '../../../route.constants';
 
@@ -32,7 +33,7 @@ export class CodeController {
       otp6: {
         summary: 'Generar OTP de 6 digitos y guardarlo',
         value: {
-          hash: 'otp-login-user-123',
+          hash: 'user123:login:sms:tenantA',
           length: 6,
           ttlSeconds: 300,
         },
@@ -44,7 +45,11 @@ export class CodeController {
   })
   @ApiBadRequestResponse({
     description:
-      'Payload invalido. Posibles codigos: ML-1014, ML-1015, ML-1016, ML-1019, ML-1020, ML-1024, ML-1025, ML-1026.',
+      'Payload invalido. Posibles codigos: ML-1014, ML-1015, ML-1016, ML-1019, ML-1020, ML-1024, ML-1025, ML-1026, ML-1028.',
+  })
+  @ApiTooManyRequestsResponse({
+    description:
+      'Se excedio el limite de solicitudes para generar codigos. Posible codigo: ML-3001.',
   })
   async generateCode(@Body() body: GenerateCodeDto) {
     const ttlSeconds = body.ttlSeconds ?? 300;
@@ -78,14 +83,14 @@ export class CodeController {
         summary: 'Validacion exitosa',
         value: {
           code: '482913',
-          hash: '482913',
+          hash: 'user123:login:sms:tenantA',
         },
       },
       validacionFallida: {
         summary: 'Validacion fallida',
         value: {
           code: '111111',
-          hash: '482913',
+          hash: 'user123:login:sms:tenantA',
         },
       },
     },
@@ -95,7 +100,11 @@ export class CodeController {
   })
   @ApiBadRequestResponse({
     description:
-      'Payload invalido. Posibles codigos: ML-1017, ML-1018, ML-1019, ML-1020.',
+      'Payload invalido. Posibles codigos: ML-1017, ML-1018, ML-1019, ML-1020, ML-1028.',
+  })
+  @ApiTooManyRequestsResponse({
+    description:
+      'Se excedio el limite de intentos de validacion. Posible codigo: ML-3000.',
   })
   async validateCode(@Body() body: ValidateCodeDto) {
     const valid = await this.codeService.validateCode(body.code, body.hash);

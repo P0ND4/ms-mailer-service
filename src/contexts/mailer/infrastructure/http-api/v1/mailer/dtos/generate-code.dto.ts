@@ -5,19 +5,26 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  Matches,
   Max,
   Min,
 } from 'class-validator';
 import { FoodaExceptionCodes } from 'src/contexts/shared/domain/exceptions/mailer-exception.codes';
 
+const HASH_CONTEXTUAL_REGEX =
+  /^[A-Za-z0-9_-]+:[A-Za-z0-9_-]+:[A-Za-z0-9_-]+(?::[A-Za-z0-9_-]+)?$/;
+
 export class GenerateCodeDto {
   @ApiProperty({
-    example: 'otp-login-user-123',
+    example: 'user123:login:sms:tenantA',
     description:
-      'Identificador unico de referencia para guardar el codigo en Redis.',
+      'Identificador contextual para guardar el codigo en Redis. Formato: userId:purpose:channel[:tenant].',
   })
   @IsString({ message: FoodaExceptionCodes.Ex1019.message })
   @IsNotEmpty({ message: FoodaExceptionCodes.Ex1020.message })
+  @Matches(HASH_CONTEXTUAL_REGEX, {
+    message: FoodaExceptionCodes.Ex1028.message,
+  })
   hash!: string;
 
   @ApiProperty({

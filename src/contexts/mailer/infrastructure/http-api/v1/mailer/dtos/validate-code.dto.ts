@@ -1,6 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsString, Matches } from 'class-validator';
 import { FoodaExceptionCodes } from 'src/contexts/shared/domain/exceptions/mailer-exception.codes';
+
+const HASH_CONTEXTUAL_REGEX =
+  /^[A-Za-z0-9_-]+:[A-Za-z0-9_-]+:[A-Za-z0-9_-]+(?::[A-Za-z0-9_-]+)?$/;
 
 export class ValidateCodeDto {
   @ApiProperty({
@@ -12,11 +15,14 @@ export class ValidateCodeDto {
   code!: string;
 
   @ApiProperty({
-    example: '482913',
+    example: 'user123:login:sms:tenantA',
     description:
-      'Hash o valor esperado contra el cual se debe validar el codigo recibido.',
+      'Identificador contextual del desafio OTP. Formato: userId:purpose:channel[:tenant].',
   })
   @IsString({ message: FoodaExceptionCodes.Ex1019.message })
   @IsNotEmpty({ message: FoodaExceptionCodes.Ex1020.message })
+  @Matches(HASH_CONTEXTUAL_REGEX, {
+    message: FoodaExceptionCodes.Ex1028.message,
+  })
   hash!: string;
 }

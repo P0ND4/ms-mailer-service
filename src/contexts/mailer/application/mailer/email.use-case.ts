@@ -7,6 +7,7 @@ import {
   MAILER_EMAIL_JOB_SEND_BULK,
   MAILER_EMAIL_QUEUE,
 } from 'src/contexts/mailer/infrastructure/queue/constants/queue.constants';
+import { EmailDeliveryOptions } from 'src/contexts/mailer/domain/types/delivery-options.type';
 
 @Injectable()
 export class EmailUseCase implements IEmailUseCase {
@@ -15,11 +16,17 @@ export class EmailUseCase implements IEmailUseCase {
     private readonly emailQueue: Queue,
   ) {}
 
-  async sendEmail(to: string, subject: string, body: string): Promise<void> {
+  async sendEmail(
+    to: string,
+    subject: string,
+    body: string,
+    options?: EmailDeliveryOptions,
+  ): Promise<void> {
     await this.emailQueue.add(MAILER_EMAIL_JOB_SEND, {
       to,
       subject,
       body,
+      options,
     });
   }
 
@@ -27,11 +34,13 @@ export class EmailUseCase implements IEmailUseCase {
     recipients: string[],
     subject: string,
     body: string,
+    options?: EmailDeliveryOptions,
   ): Promise<void> {
     await this.emailQueue.add(MAILER_EMAIL_JOB_SEND_BULK, {
       recipients,
       subject,
       body,
+      options,
     });
   }
 }

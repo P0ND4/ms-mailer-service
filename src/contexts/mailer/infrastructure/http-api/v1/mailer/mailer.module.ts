@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { BullModule } from '@nestjs/bullmq';
+import { BULL_DEFAULT_JOB_OPTIONS } from 'src/config/bull.config';
 import { EmailUseCase } from 'src/contexts/mailer/application/mailer/email.use-case';
 import { IEmailUseCase } from 'src/contexts/mailer/domain/use-cases/mailer/email.use-case.interface';
 import { SharedModule } from 'src/contexts/shared/shared.module';
@@ -16,6 +17,8 @@ import {
   MAILER_EMAIL_QUEUE,
   MAILER_PHONE_QUEUE,
 } from 'src/contexts/mailer/infrastructure/queue/constants/queue.constants';
+import { EmailChannelProvider } from 'src/contexts/mailer/infrastructure/providers/email-channel.provider';
+import { TwilioChannelProvider } from 'src/contexts/mailer/infrastructure/providers/twilio-channel.provider';
 
 const providers = [
   {
@@ -38,31 +41,21 @@ const providers = [
     BullModule.registerQueue(
       {
         name: MAILER_EMAIL_QUEUE,
-        defaultJobOptions: {
-          attempts: 3,
-          backoff: {
-            type: 'exponential',
-            delay: 2000,
-          },
-          removeOnComplete: 1000,
-          removeOnFail: 1000,
-        },
+        defaultJobOptions: BULL_DEFAULT_JOB_OPTIONS,
       },
       {
         name: MAILER_PHONE_QUEUE,
-        defaultJobOptions: {
-          attempts: 3,
-          backoff: {
-            type: 'exponential',
-            delay: 2000,
-          },
-          removeOnComplete: 1000,
-          removeOnFail: 1000,
-        },
+        defaultJobOptions: BULL_DEFAULT_JOB_OPTIONS,
       },
     ),
   ],
   controllers: [EmailController, PhoneController, CodeController],
-  providers: [...providers, EmailProcessor, PhoneProcessor],
+  providers: [
+    ...providers,
+    EmailProcessor,
+    PhoneProcessor,
+    EmailChannelProvider,
+    TwilioChannelProvider,
+  ],
 })
 export class MailerModule {}

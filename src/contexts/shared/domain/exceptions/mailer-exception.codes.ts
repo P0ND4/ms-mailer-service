@@ -134,4 +134,52 @@ export const FoodaExceptionCodes = {
     `${SERVICE_PREFIX}-1026`,
     'ttlSeconds debe ser menor o igual a 1800 segundos',
   ),
+  Ex1027: new FoodaExceptionInfo(
+    `${SERVICE_PREFIX}-1027`,
+    'options tiene que ser un objeto',
+  ),
+  Ex1028: new FoodaExceptionInfo(
+    `${SERVICE_PREFIX}-1028`,
+    'hash debe cumplir formato contextual userId:purpose:channel[:tenant]',
+  ),
+
+  // Errores de Integracion (2000-2999)
+  Ex2000: new FoodaExceptionInfo(
+    `${SERVICE_PREFIX}-2000`,
+    'MAIL_HOST es requerido para configurar el proveedor de correo',
+  ),
+  Ex2001: new FoodaExceptionInfo(
+    `${SERVICE_PREFIX}-2001`,
+    'MAIL_FROM o MAIL_USER es requerido para enviar correos',
+  ),
+  Ex2002: new FoodaExceptionInfo(
+    `${SERVICE_PREFIX}-2002`,
+    'No se pudo completar el envio de correo',
+  ),
+  Ex2003: new FoodaExceptionInfo(
+    `${SERVICE_PREFIX}-2003`,
+    'TWILIO_ACCOUNT_SID y TWILIO_AUTH_TOKEN son requeridos para configurar Twilio',
+  ),
+  Ex2004: new FoodaExceptionInfo(
+    `${SERVICE_PREFIX}-2004`,
+    'Configuracion incompleta de Twilio para el canal solicitado',
+  ),
+  Ex2005: new FoodaExceptionInfo(
+    `${SERVICE_PREFIX}-2005`,
+    'No se pudo completar el envio por Twilio',
+  ),
+  Ex2006: new FoodaExceptionInfo(
+    `${SERVICE_PREFIX}-2006`,
+    'Tipo de job no soportado para el canal de mensajeria',
+  ),
+
+  // Errores de Seguridad OTP (3000-3999)
+  Ex3000: new FoodaExceptionInfo(
+    `${SERVICE_PREFIX}-3000`,
+    'Se excedio el limite de intentos de validacion para este codigo',
+  ),
+  Ex3001: new FoodaExceptionInfo(
+    `${SERVICE_PREFIX}-3001`,
+    'Se excedio el limite de solicitudes de generacion de codigo',
+  ),
 };

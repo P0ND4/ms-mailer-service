@@ -11,6 +11,7 @@ import {
   MAILER_PHONE_JOB_SEND_WHATSAPP,
   MAILER_PHONE_QUEUE,
 } from 'src/contexts/mailer/infrastructure/queue/constants/queue.constants';
+import { PhoneDeliveryOptions } from 'src/contexts/mailer/domain/types/delivery-options.type';
 
 @Injectable()
 export class PhoneUseCase implements IPhoneUseCase {
@@ -19,48 +20,75 @@ export class PhoneUseCase implements IPhoneUseCase {
     private readonly phoneQueue: Queue,
   ) {}
 
-  async sendBulkSMS(recipients: string[], message: string): Promise<void> {
+  async sendBulkSMS(
+    recipients: string[],
+    message: string,
+    options?: PhoneDeliveryOptions,
+  ): Promise<void> {
     await this.phoneQueue.add(MAILER_PHONE_JOB_SEND_BULK_SMS, {
       recipients,
       message,
+      options,
     });
   }
 
   async sendBulkVoiceCall(
     recipients: string[],
     message: string,
+    options?: PhoneDeliveryOptions,
   ): Promise<void> {
     await this.phoneQueue.add(MAILER_PHONE_JOB_SEND_BULK_VOICE_CALL, {
       recipients,
       message,
+      options,
     });
   }
 
-  async sendBulkWhatsApp(recipients: string[], message: string): Promise<void> {
+  async sendBulkWhatsApp(
+    recipients: string[],
+    message: string,
+    options?: PhoneDeliveryOptions,
+  ): Promise<void> {
     await this.phoneQueue.add(MAILER_PHONE_JOB_SEND_BULK_WHATSAPP, {
       recipients,
       message,
+      options,
     });
   }
 
-  async sendSMS(to: string, message: string): Promise<void> {
+  async sendSMS(
+    to: string,
+    message: string,
+    options?: PhoneDeliveryOptions,
+  ): Promise<void> {
     await this.phoneQueue.add(MAILER_PHONE_JOB_SEND_SMS, {
       to,
       message,
+      options,
     });
   }
 
-  async sendVoiceCall(to: string, message: string): Promise<void> {
+  async sendVoiceCall(
+    to: string,
+    message: string,
+    options?: PhoneDeliveryOptions,
+  ): Promise<void> {
     await this.phoneQueue.add(MAILER_PHONE_JOB_SEND_VOICE_CALL, {
       to,
       message,
+      options,
     });
   }
 
-  async sendWhatsApp(to: string, message: string): Promise<void> {
+  async sendWhatsApp(
+    to: string,
+    message: string,
+    options?: PhoneDeliveryOptions,
+  ): Promise<void> {
     await this.phoneQueue.add(MAILER_PHONE_JOB_SEND_WHATSAPP, {
       to,
       message,
+      options,
     });
   }
 }

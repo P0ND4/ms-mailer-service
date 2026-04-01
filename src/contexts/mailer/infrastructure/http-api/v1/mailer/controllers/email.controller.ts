@@ -26,7 +26,7 @@ export class EmailController {
   @ApiBody({
     type: SendEmailDto,
     description:
-      'Payload para envio individual. El campo `to` debe ser un correo valido.',
+      'Payload para envio individual. El campo `to` debe ser un correo valido y `options` es opcional para personalizacion avanzada.',
     examples: {
       confirmacionCompra: {
         summary: 'Correo de confirmacion de compra',
@@ -36,6 +36,22 @@ export class EmailController {
           body: 'Tu pedido fue procesado correctamente. Gracias por tu compra.',
         },
       },
+      conOpcionesAvanzadas: {
+        summary: 'Correo individual con opciones de entrega',
+        value: {
+          to: 'cliente@empresa.com',
+          subject: 'Actualizacion de politica de privacidad',
+          body: '<h1>Actualizacion importante</h1><p>Revisa los cambios aplicados.</p>',
+          options: {
+            from: 'notificaciones@empresa.com',
+            replyTo: 'soporte@empresa.com',
+            cc: ['auditoria@empresa.com'],
+            headers: {
+              'x-origin-service': 'mailer-service',
+            },
+          },
+        },
+      },
     },
   })
   @ApiOkResponse({
@@ -43,10 +59,15 @@ export class EmailController {
   })
   @ApiBadRequestResponse({
     description:
-      'Payload invalido. Posibles codigos: ML-1000, ML-1001, ML-1002, ML-1003, ML-1004, ML-1005.',
+      'Payload invalido. Posibles codigos: ML-1000, ML-1001, ML-1002, ML-1003, ML-1004, ML-1005, ML-1027.',
   })
   async sendEmail(@Body() body: SendEmailDto) {
-    await this.emailService.sendEmail(body.to, body.subject, body.body);
+    await this.emailService.sendEmail(
+      body.to,
+      body.subject,
+      body.body,
+      body.options,
+    );
 
     return {
       sent: true,
@@ -66,7 +87,7 @@ export class EmailController {
   @ApiBody({
     type: SendBulkEmailDto,
     description:
-      'Payload para envio masivo. `recipients` debe contener correos validos y sin duplicados.',
+      'Payload para envio masivo. `recipients` debe contener correos validos y sin duplicados. `options` permite estrategia de entrega y metadatos.',
     examples: {
       mantenimientoProgramado: {
         summary: 'Notificacion de mantenimiento',
@@ -76,6 +97,21 @@ export class EmailController {
           body: 'Este domingo entre 02:00 y 03:00 UTC realizaremos mantenimiento preventivo.',
         },
       },
+      campanaBcc: {
+        summary: 'Campana masiva en modo BCC',
+        value: {
+          recipients: ['user1@empresa.com', 'user2@empresa.com'],
+          subject: 'Comunicado institucional',
+          body: '<p>Nuevo comunicado para todos los usuarios activos.</p>',
+          options: {
+            from: 'comunicaciones@empresa.com',
+            sendAsBcc: true,
+            headers: {
+              'x-campaign-id': 'camp-2026-04',
+            },
+          },
+        },
+      },
     },
   })
   @ApiOkResponse({
@@ -83,13 +119,14 @@ export class EmailController {
   })
   @ApiBadRequestResponse({
     description:
-      'Payload invalido. Posibles codigos: ML-1002, ML-1003, ML-1004, ML-1005, ML-1006, ML-1007, ML-1008, ML-1013, ML-1021.',
+      'Payload invalido. Posibles codigos: ML-1002, ML-1003, ML-1004, ML-1005, ML-1006, ML-1007, ML-1008, ML-1013, ML-1021, ML-1027.',
   })
   async sendBulkEmail(@Body() body: SendBulkEmailDto) {
     await this.emailService.sendBulkEmail(
       body.recipients,
       body.subject,
       body.body,
+      body.options,
     );
 
     return {

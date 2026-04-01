@@ -25,7 +25,8 @@ export class PhoneController {
   })
   @ApiBody({
     type: SendPhoneMessageDto,
-    description: 'Datos del destinatario y contenido del SMS.',
+    description:
+      'Datos del destinatario y contenido del SMS. `options` es opcional para personalizar parametros de Twilio.',
     examples: {
       otp: {
         summary: 'Envio OTP por SMS',
@@ -34,15 +35,26 @@ export class PhoneController {
           message: 'Tu codigo de verificacion es 482913',
         },
       },
+      smsConMessagingService: {
+        summary: 'SMS usando messaging service y callback',
+        value: {
+          to: '+51999888777',
+          message: 'Tu pedido fue entregado correctamente.',
+          options: {
+            messagingServiceSid: 'MGXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+            statusCallback: 'https://api.empresa.com/twilio/status',
+          },
+        },
+      },
     },
   })
   @ApiOkResponse({ description: 'SMS enviado correctamente.' })
   @ApiBadRequestResponse({
     description:
-      'Payload invalido. Posibles codigos: ML-1009, ML-1010, ML-1011, ML-1012, ML-1022.',
+      'Payload invalido. Posibles codigos: ML-1009, ML-1010, ML-1011, ML-1012, ML-1022, ML-1027.',
   })
   async sendSMS(@Body() body: SendPhoneMessageDto) {
-    await this.phoneUseCase.sendSMS(body.to, body.message);
+    await this.phoneUseCase.sendSMS(body.to, body.message, body.options);
     return {
       sent: true,
       channel: 'phone',
@@ -62,14 +74,30 @@ export class PhoneController {
     type: SendBulkPhoneMessageDto,
     description:
       'Listado de numeros destino en E.164 y mensaje compartido para todos.',
+    examples: {
+      recordatorioMasivo: {
+        summary: 'SMS masivo de recordatorio',
+        value: {
+          recipients: ['+51999888777', '+5215511122233'],
+          message: 'Recordatorio: tu cita es hoy a las 16:30',
+          options: {
+            from: '+15005550006',
+          },
+        },
+      },
+    },
   })
   @ApiOkResponse({ description: 'SMS masivo enviado correctamente.' })
   @ApiBadRequestResponse({
     description:
-      'Payload invalido. Posibles codigos: ML-1006, ML-1007, ML-1011, ML-1012, ML-1013, ML-1021, ML-1023.',
+      'Payload invalido. Posibles codigos: ML-1006, ML-1007, ML-1011, ML-1012, ML-1013, ML-1021, ML-1023, ML-1027.',
   })
   async sendBulkSMS(@Body() body: SendBulkPhoneMessageDto) {
-    await this.phoneUseCase.sendBulkSMS(body.recipients, body.message);
+    await this.phoneUseCase.sendBulkSMS(
+      body.recipients,
+      body.message,
+      body.options,
+    );
     return {
       sent: true,
       channel: 'phone',
@@ -87,15 +115,29 @@ export class PhoneController {
   })
   @ApiBody({
     type: SendPhoneMessageDto,
-    description: 'Datos del destinatario y contenido del mensaje de WhatsApp.',
+    description:
+      'Datos del destinatario y contenido del mensaje de WhatsApp. El servicio normaliza el prefijo `whatsapp:` automaticamente.',
+    examples: {
+      notificacionWhatsapp: {
+        summary: 'WhatsApp individual',
+        value: {
+          to: '+51999888777',
+          message: 'Tu orden #8912 ya esta en camino.',
+          options: {
+            from: 'whatsapp:+14155238886',
+            statusCallback: 'https://api.empresa.com/twilio/whatsapp-status',
+          },
+        },
+      },
+    },
   })
   @ApiOkResponse({ description: 'Mensaje de WhatsApp enviado correctamente.' })
   @ApiBadRequestResponse({
     description:
-      'Payload invalido. Posibles codigos: ML-1009, ML-1010, ML-1011, ML-1012, ML-1022.',
+      'Payload invalido. Posibles codigos: ML-1009, ML-1010, ML-1011, ML-1012, ML-1022, ML-1027.',
   })
   async sendWhatsApp(@Body() body: SendPhoneMessageDto) {
-    await this.phoneUseCase.sendWhatsApp(body.to, body.message);
+    await this.phoneUseCase.sendWhatsApp(body.to, body.message, body.options);
     return {
       sent: true,
       channel: 'phone',
@@ -115,14 +157,30 @@ export class PhoneController {
     type: SendBulkPhoneMessageDto,
     description:
       'Listado de numeros destino en E.164 y mensaje compartido para todos.',
+    examples: {
+      whatsappMasivo: {
+        summary: 'WhatsApp masivo',
+        value: {
+          recipients: ['+51999888777', '+5215511122233'],
+          message: 'Aviso: mantenimiento programado hoy a las 23:00 UTC.',
+          options: {
+            messagingServiceSid: 'MGXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+          },
+        },
+      },
+    },
   })
   @ApiOkResponse({ description: 'WhatsApp masivo enviado correctamente.' })
   @ApiBadRequestResponse({
     description:
-      'Payload invalido. Posibles codigos: ML-1006, ML-1007, ML-1011, ML-1012, ML-1013, ML-1021, ML-1023.',
+      'Payload invalido. Posibles codigos: ML-1006, ML-1007, ML-1011, ML-1012, ML-1013, ML-1021, ML-1023, ML-1027.',
   })
   async sendBulkWhatsApp(@Body() body: SendBulkPhoneMessageDto) {
-    await this.phoneUseCase.sendBulkWhatsApp(body.recipients, body.message);
+    await this.phoneUseCase.sendBulkWhatsApp(
+      body.recipients,
+      body.message,
+      body.options,
+    );
     return {
       sent: true,
       channel: 'phone',
@@ -142,14 +200,28 @@ export class PhoneController {
     type: SendPhoneMessageDto,
     description:
       'Datos del destinatario y mensaje que sera reproducido durante la llamada.',
+    examples: {
+      llamadaConTwiml: {
+        summary: 'Llamada individual con TwiML personalizado',
+        value: {
+          to: '+51999888777',
+          message: 'Mensaje de respaldo si no se envia twiml.',
+          options: {
+            from: '+15005550006',
+            twiml:
+              '<Response><Say language="es-ES">Tu codigo de verificacion es 482913</Say></Response>',
+          },
+        },
+      },
+    },
   })
   @ApiOkResponse({ description: 'Llamada de voz enviada correctamente.' })
   @ApiBadRequestResponse({
     description:
-      'Payload invalido. Posibles codigos: ML-1009, ML-1010, ML-1011, ML-1012, ML-1022.',
+      'Payload invalido. Posibles codigos: ML-1009, ML-1010, ML-1011, ML-1012, ML-1022, ML-1027.',
   })
   async sendVoiceCall(@Body() body: SendPhoneMessageDto) {
-    await this.phoneUseCase.sendVoiceCall(body.to, body.message);
+    await this.phoneUseCase.sendVoiceCall(body.to, body.message, body.options);
     return {
       sent: true,
       channel: 'phone',
@@ -169,16 +241,34 @@ export class PhoneController {
     type: SendBulkPhoneMessageDto,
     description:
       'Listado de numeros destino en E.164 y mensaje compartido para todos.',
+    examples: {
+      llamadasMasivasConUrl: {
+        summary: 'Llamadas masivas usando Voice URL',
+        value: {
+          recipients: ['+51999888777', '+5215511122233'],
+          message: 'Mensaje de respaldo en caso de no configurar voiceUrl.',
+          options: {
+            from: '+15005550006',
+            voiceUrl: 'https://api.empresa.com/twilio/voice-script.xml',
+            statusCallback: 'https://api.empresa.com/twilio/voice-status',
+          },
+        },
+      },
+    },
   })
   @ApiOkResponse({
     description: 'Llamadas de voz masivas enviadas correctamente.',
   })
   @ApiBadRequestResponse({
     description:
-      'Payload invalido. Posibles codigos: ML-1006, ML-1007, ML-1011, ML-1012, ML-1013, ML-1021, ML-1023.',
+      'Payload invalido. Posibles codigos: ML-1006, ML-1007, ML-1011, ML-1012, ML-1013, ML-1021, ML-1023, ML-1027.',
   })
   async sendBulkVoiceCall(@Body() body: SendBulkPhoneMessageDto) {
-    await this.phoneUseCase.sendBulkVoiceCall(body.recipients, body.message);
+    await this.phoneUseCase.sendBulkVoiceCall(
+      body.recipients,
+      body.message,
+      body.options,
+    );
     return {
       sent: true,
       channel: 'phone',

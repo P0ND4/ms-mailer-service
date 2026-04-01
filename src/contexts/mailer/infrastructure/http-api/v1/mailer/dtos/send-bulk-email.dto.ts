@@ -1,13 +1,16 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   ArrayNotEmpty,
   ArrayUnique,
   IsArray,
   IsEmail,
   IsNotEmpty,
+  IsObject,
+  IsOptional,
   IsString,
 } from 'class-validator';
 import { FoodaExceptionCodes } from 'src/contexts/shared/domain/exceptions/mailer-exception.codes';
+import type { EmailDeliveryOptions } from 'src/contexts/mailer/domain/types/delivery-options.type';
 
 export class SendBulkEmailDto {
   @ApiProperty({
@@ -39,4 +42,17 @@ export class SendBulkEmailDto {
   @IsString({ message: FoodaExceptionCodes.Ex1004.message })
   @IsNotEmpty({ message: FoodaExceptionCodes.Ex1005.message })
   body!: string;
+
+  @ApiPropertyOptional({
+    example: {
+      from: 'notificaciones@empresa.com',
+      sendAsBcc: true,
+      headers: { 'x-campaign': 'maintenance-2026-04' },
+    },
+    description:
+      'Opciones avanzadas para correo masivo (por ejemplo, modo BCC, remitente o headers).',
+  })
+  @IsOptional()
+  @IsObject({ message: FoodaExceptionCodes.Ex1027.message })
+  options?: EmailDeliveryOptions;
 }

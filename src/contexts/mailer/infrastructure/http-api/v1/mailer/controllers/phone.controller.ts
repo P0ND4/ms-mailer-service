@@ -1,7 +1,8 @@
-import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import { Body, Controller, Headers, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiBody,
+  ApiHeader,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
@@ -12,6 +13,12 @@ import { SendPhoneMessageDto } from '../dtos/send-phone-message.dto';
 import { SendBulkPhoneMessageDto } from '../dtos/send-bulk-phone-message.dto';
 
 @ApiTags('Mailer Phone')
+@ApiHeader({
+  name: 'x-tenant-id',
+  required: true,
+  description: 'Identificador del tenant (schema de la base de datos)',
+  example: 'tenant_abc',
+})
 @Controller(`${V1_MAILER}/phone`)
 export class PhoneController {
   constructor(private readonly phoneUseCase: IPhoneUseCase) {}
@@ -53,8 +60,11 @@ export class PhoneController {
     description:
       'Payload invalido. Posibles codigos: ML-1009, ML-1010, ML-1011, ML-1012, ML-1022, ML-1027.',
   })
-  async sendSMS(@Body() body: SendPhoneMessageDto) {
-    await this.phoneUseCase.sendSMS(body.to, body.message, body.options);
+  async sendSMS(
+    @Headers('x-tenant-id') tenantId: string,
+    @Body() body: SendPhoneMessageDto,
+  ) {
+    await this.phoneUseCase.sendSMS(tenantId, body.to, body.message, body.options);
     return {
       sent: true,
       channel: 'phone',
@@ -92,8 +102,12 @@ export class PhoneController {
     description:
       'Payload invalido. Posibles codigos: ML-1006, ML-1007, ML-1011, ML-1012, ML-1013, ML-1021, ML-1023, ML-1027.',
   })
-  async sendBulkSMS(@Body() body: SendBulkPhoneMessageDto) {
+  async sendBulkSMS(
+    @Headers('x-tenant-id') tenantId: string,
+    @Body() body: SendBulkPhoneMessageDto,
+  ) {
     await this.phoneUseCase.sendBulkSMS(
+      tenantId,
       body.recipients,
       body.message,
       body.options,
@@ -136,8 +150,11 @@ export class PhoneController {
     description:
       'Payload invalido. Posibles codigos: ML-1009, ML-1010, ML-1011, ML-1012, ML-1022, ML-1027.',
   })
-  async sendWhatsApp(@Body() body: SendPhoneMessageDto) {
-    await this.phoneUseCase.sendWhatsApp(body.to, body.message, body.options);
+  async sendWhatsApp(
+    @Headers('x-tenant-id') tenantId: string,
+    @Body() body: SendPhoneMessageDto,
+  ) {
+    await this.phoneUseCase.sendWhatsApp(tenantId, body.to, body.message, body.options);
     return {
       sent: true,
       channel: 'phone',
@@ -175,8 +192,12 @@ export class PhoneController {
     description:
       'Payload invalido. Posibles codigos: ML-1006, ML-1007, ML-1011, ML-1012, ML-1013, ML-1021, ML-1023, ML-1027.',
   })
-  async sendBulkWhatsApp(@Body() body: SendBulkPhoneMessageDto) {
+  async sendBulkWhatsApp(
+    @Headers('x-tenant-id') tenantId: string,
+    @Body() body: SendBulkPhoneMessageDto,
+  ) {
     await this.phoneUseCase.sendBulkWhatsApp(
+      tenantId,
       body.recipients,
       body.message,
       body.options,
@@ -220,8 +241,11 @@ export class PhoneController {
     description:
       'Payload invalido. Posibles codigos: ML-1009, ML-1010, ML-1011, ML-1012, ML-1022, ML-1027.',
   })
-  async sendVoiceCall(@Body() body: SendPhoneMessageDto) {
-    await this.phoneUseCase.sendVoiceCall(body.to, body.message, body.options);
+  async sendVoiceCall(
+    @Headers('x-tenant-id') tenantId: string,
+    @Body() body: SendPhoneMessageDto,
+  ) {
+    await this.phoneUseCase.sendVoiceCall(tenantId, body.to, body.message, body.options);
     return {
       sent: true,
       channel: 'phone',
@@ -263,8 +287,12 @@ export class PhoneController {
     description:
       'Payload invalido. Posibles codigos: ML-1006, ML-1007, ML-1011, ML-1012, ML-1013, ML-1021, ML-1023, ML-1027.',
   })
-  async sendBulkVoiceCall(@Body() body: SendBulkPhoneMessageDto) {
+  async sendBulkVoiceCall(
+    @Headers('x-tenant-id') tenantId: string,
+    @Body() body: SendBulkPhoneMessageDto,
+  ) {
     await this.phoneUseCase.sendBulkVoiceCall(
+      tenantId,
       body.recipients,
       body.message,
       body.options,

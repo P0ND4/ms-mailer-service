@@ -17,13 +17,14 @@ describe('PhoneController', () => {
   it('sends sms and returns channel metadata', async () => {
     const controller = new PhoneController(phoneUseCase as any);
 
-    const response = await controller.sendSMS({
+    const response = await controller.sendSMS('tenant_abc', {
       to: '+51999888777',
       message: 'OTP 1234',
       options: { from: '+15005550006' },
     });
 
     expect(phoneUseCase.sendSMS).toHaveBeenCalledWith(
+      'tenant_abc',
       '+51999888777',
       'OTP 1234',
       { from: '+15005550006' },
@@ -39,13 +40,14 @@ describe('PhoneController', () => {
   it('sends bulk sms and returns recipients count', async () => {
     const controller = new PhoneController(phoneUseCase as any);
 
-    const response = await controller.sendBulkSMS({
+    const response = await controller.sendBulkSMS('tenant_abc', {
       recipients: ['+1', '+2'],
       message: 'bulk',
       options: { from: '+15005550006' },
     });
 
     expect(phoneUseCase.sendBulkSMS).toHaveBeenCalledWith(
+      'tenant_abc',
       ['+1', '+2'],
       'bulk',
       { from: '+15005550006' },
@@ -61,21 +63,22 @@ describe('PhoneController', () => {
   it('sends whatsapp variants', async () => {
     const controller = new PhoneController(phoneUseCase as any);
 
-    const single = await controller.sendWhatsApp({
+    const single = await controller.sendWhatsApp('tenant_abc', {
       to: '+1',
       message: 'wa',
       options: { messagingServiceSid: 'MG1' },
     });
-    const bulk = await controller.sendBulkWhatsApp({
+    const bulk = await controller.sendBulkWhatsApp('tenant_abc', {
       recipients: ['+1', '+2'],
       message: 'bulk-wa',
       options: { messagingServiceSid: 'MG1' },
     });
 
-    expect(phoneUseCase.sendWhatsApp).toHaveBeenCalledWith('+1', 'wa', {
+    expect(phoneUseCase.sendWhatsApp).toHaveBeenCalledWith('tenant_abc', '+1', 'wa', {
       messagingServiceSid: 'MG1',
     });
     expect(phoneUseCase.sendBulkWhatsApp).toHaveBeenCalledWith(
+      'tenant_abc',
       ['+1', '+2'],
       'bulk-wa',
       { messagingServiceSid: 'MG1' },
@@ -88,21 +91,22 @@ describe('PhoneController', () => {
   it('sends voice call variants', async () => {
     const controller = new PhoneController(phoneUseCase as any);
 
-    const single = await controller.sendVoiceCall({
+    const single = await controller.sendVoiceCall('tenant_abc', {
       to: '+1',
       message: 'voice',
       options: { voiceUrl: 'https://voice.example.com' },
     });
-    const bulk = await controller.sendBulkVoiceCall({
+    const bulk = await controller.sendBulkVoiceCall('tenant_abc', {
       recipients: ['+1', '+2'],
       message: 'bulk-voice',
       options: { voiceUrl: 'https://voice.example.com' },
     });
 
-    expect(phoneUseCase.sendVoiceCall).toHaveBeenCalledWith('+1', 'voice', {
+    expect(phoneUseCase.sendVoiceCall).toHaveBeenCalledWith('tenant_abc', '+1', 'voice', {
       voiceUrl: 'https://voice.example.com',
     });
     expect(phoneUseCase.sendBulkVoiceCall).toHaveBeenCalledWith(
+      'tenant_abc',
       ['+1', '+2'],
       'bulk-voice',
       { voiceUrl: 'https://voice.example.com' },

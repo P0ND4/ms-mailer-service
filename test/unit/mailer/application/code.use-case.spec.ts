@@ -4,6 +4,7 @@ import { FoodaException } from 'src/contexts/shared/domain/exceptions/mailer.exc
 
 describe('CodeUseCase', () => {
   const hash = 'user123:login:sms:tenantA';
+  const tenantId = 'tenant_abc';
 
   const createRepositoryMock = () => ({
     saveVerificationCode: jest.fn().mockResolvedValue(undefined),
@@ -25,19 +26,21 @@ describe('CodeUseCase', () => {
     const configService = createConfigMock();
     const useCase = new CodeUseCase(repository as any, configService as any);
 
-    const code = await useCase.generateCode(6, hash, 300);
+    const code = await useCase.generateCode(tenantId, 6, hash, 300);
 
     expect(code).toMatch(/^\d{6}$/);
     expect(repository.incrementGenerationRequests).toHaveBeenCalledWith(
+      tenantId,
       hash,
       60,
     );
     expect(repository.saveVerificationCode).toHaveBeenCalledWith(
+      tenantId,
       hash,
       code,
       300,
     );
-    expect(repository.resetValidationAttempts).toHaveBeenCalledWith(hash);
+    expect(repository.resetValidationAttempts).toHaveBeenCalledWith(tenantId, hash);
   });
 
   it('blocks generation when rate limit is exceeded', async () => {
@@ -48,7 +51,7 @@ describe('CodeUseCase', () => {
     });
     const useCase = new CodeUseCase(repository as any, configService as any);
 
-    await expect(useCase.generateCode(6, hash, 300)).rejects.toMatchObject({
+    await expect(useCase.generateCode(tenantId, 6, hash, 300)).rejects.toMatchObject({
       code: FoodaExceptionCodes.Ex3001.code,
     } as FoodaException);
   });
@@ -59,10 +62,10 @@ describe('CodeUseCase', () => {
     const configService = createConfigMock({ OTP_MAX_VALIDATE_ATTEMPTS: 5 });
     const useCase = new CodeUseCase(repository as any, configService as any);
 
-    await expect(useCase.validateCode('123456', hash)).rejects.toMatchObject({
+    await expect(useCase.validateCode(tenantId, '123456', hash)).rejects.toMatchObject({
       code: FoodaExceptionCodes.Ex3000.code,
     } as FoodaException);
-    expect(repository.deleteVerificationCode).toHaveBeenCalledWith(hash);
+    expect(repository.deleteVerificationCode).toHaveBeenCalledWith(tenantId, hash);
   });
 
   it('returns false for invalid code and increments attempts using OTP TTL', async () => {
@@ -73,10 +76,11 @@ describe('CodeUseCase', () => {
     const configService = createConfigMock();
     const useCase = new CodeUseCase(repository as any, configService as any);
 
-    const result = await useCase.validateCode('111111', hash);
+    const result = await useCase.validateCode(tenantId, '111111', hash);
 
     expect(result).toBe(false);
     expect(repository.incrementValidationAttempts).toHaveBeenCalledWith(
+      tenantId,
       hash,
       180,
     );
@@ -91,9 +95,10 @@ describe('CodeUseCase', () => {
     });
     const useCase = new CodeUseCase(repository as any, configService as any);
 
-    await useCase.validateCode('111111', hash);
+    await useCase.validateCode(tenantId, '111111', hash);
 
     expect(repository.incrementValidationAttempts).toHaveBeenCalledWith(
+      tenantId,
       hash,
       777,
     );
@@ -106,10 +111,10 @@ describe('CodeUseCase', () => {
     const configService = createConfigMock({ OTP_MAX_VALIDATE_ATTEMPTS: 5 });
     const useCase = new CodeUseCase(repository as any, configService as any);
 
-    await expect(useCase.validateCode('111111', hash)).rejects.toMatchObject({
+    await expect(useCase.validateCode(tenantId, '111111', hash)).rejects.toMatchObject({
       code: FoodaExceptionCodes.Ex3000.code,
     } as FoodaException);
-    expect(repository.deleteVerificationCode).toHaveBeenCalledWith(hash);
+    expect(repository.deleteVerificationCode).toHaveBeenCalledWith(tenantId, hash);
   });
 
   it('returns true for valid code and clears code plus attempts', async () => {
@@ -118,10 +123,10 @@ describe('CodeUseCase', () => {
     const configService = createConfigMock();
     const useCase = new CodeUseCase(repository as any, configService as any);
 
-    const result = await useCase.validateCode('482913', hash);
+    const result = await useCase.validateCode(tenantId, '482913', hash);
 
     expect(result).toBe(true);
-    expect(repository.deleteVerificationCode).toHaveBeenCalledWith(hash);
-    expect(repository.resetValidationAttempts).toHaveBeenCalledWith(hash);
+    expect(repository.deleteVerificationCode).toHaveBeenCalledWith(tenantId, hash);
+    expect(repository.resetValidationAttempts).toHaveBeenCalledWith(tenantId, hash);
   });
 });

@@ -17,12 +17,14 @@ export class EmailUseCase implements IEmailUseCase {
   ) {}
 
   async sendEmail(
+    tenantId: string,
     to: string,
     subject: string,
     body: string,
     options?: EmailDeliveryOptions,
   ): Promise<void> {
     await this.emailQueue.add(MAILER_EMAIL_JOB_SEND, {
+      tenantId,
       to,
       subject,
       body,
@@ -31,12 +33,14 @@ export class EmailUseCase implements IEmailUseCase {
   }
 
   async sendBulkEmail(
+    tenantId: string,
     recipients: string[],
     subject: string,
     body: string,
     options?: EmailDeliveryOptions,
   ): Promise<void> {
     await this.emailQueue.add(MAILER_EMAIL_JOB_SEND_BULK, {
+      tenantId,
       recipients,
       subject,
       body,

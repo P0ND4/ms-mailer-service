@@ -13,7 +13,7 @@ describe('EmailController', () => {
   it('sends single email and returns response payload', async () => {
     const controller = new EmailController(emailService as any);
 
-    const response = await controller.sendEmail({
+    const response = await controller.sendEmail('tenant_abc', {
       to: 'a@company.com',
       subject: 'Hello',
       body: 'Message',
@@ -21,6 +21,7 @@ describe('EmailController', () => {
     });
 
     expect(emailService.sendEmail).toHaveBeenCalledWith(
+      'tenant_abc',
       'a@company.com',
       'Hello',
       'Message',
@@ -37,7 +38,7 @@ describe('EmailController', () => {
   it('sends bulk email and returns recipients count', async () => {
     const controller = new EmailController(emailService as any);
 
-    const response = await controller.sendBulkEmail({
+    const response = await controller.sendBulkEmail('tenant_abc', {
       recipients: ['a@company.com', 'b@company.com'],
       subject: 'Hello',
       body: 'Message',
@@ -45,6 +46,7 @@ describe('EmailController', () => {
     });
 
     expect(emailService.sendBulkEmail).toHaveBeenCalledWith(
+      'tenant_abc',
       ['a@company.com', 'b@company.com'],
       'Hello',
       'Message',

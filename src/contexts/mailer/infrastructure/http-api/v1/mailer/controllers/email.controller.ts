@@ -1,7 +1,8 @@
-import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import { Body, Controller, Headers, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiBody,
+  ApiHeader,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
@@ -12,6 +13,12 @@ import { SendEmailDto } from '../dtos/send-email.dto';
 import { SendBulkEmailDto } from '../dtos/send-bulk-email.dto';
 
 @ApiTags('Mailer Email')
+@ApiHeader({
+  name: 'x-tenant-id',
+  required: true,
+  description: 'Identificador del tenant (schema de la base de datos)',
+  example: 'tenant_abc',
+})
 @Controller(`${V1_MAILER}/email`)
 export class EmailController {
   constructor(private readonly emailService: IEmailUseCase) {}
@@ -61,8 +68,12 @@ export class EmailController {
     description:
       'Payload invalido. Posibles codigos: ML-1000, ML-1001, ML-1002, ML-1003, ML-1004, ML-1005, ML-1027.',
   })
-  async sendEmail(@Body() body: SendEmailDto) {
+  async sendEmail(
+    @Headers('x-tenant-id') tenantId: string,
+    @Body() body: SendEmailDto,
+  ) {
     await this.emailService.sendEmail(
+      tenantId,
       body.to,
       body.subject,
       body.body,
@@ -121,8 +132,12 @@ export class EmailController {
     description:
       'Payload invalido. Posibles codigos: ML-1002, ML-1003, ML-1004, ML-1005, ML-1006, ML-1007, ML-1008, ML-1013, ML-1021, ML-1027.',
   })
-  async sendBulkEmail(@Body() body: SendBulkEmailDto) {
+  async sendBulkEmail(
+    @Headers('x-tenant-id') tenantId: string,
+    @Body() body: SendBulkEmailDto,
+  ) {
     await this.emailService.sendBulkEmail(
+      tenantId,
       body.recipients,
       body.subject,
       body.body,

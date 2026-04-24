@@ -21,11 +21,13 @@ export class PhoneUseCase implements IPhoneUseCase {
   ) {}
 
   async sendBulkSMS(
+    tenantId: string,
     recipients: string[],
     message: string,
     options?: PhoneDeliveryOptions,
   ): Promise<void> {
     await this.phoneQueue.add(MAILER_PHONE_JOB_SEND_BULK_SMS, {
+      tenantId,
       recipients,
       message,
       options,
@@ -33,11 +35,13 @@ export class PhoneUseCase implements IPhoneUseCase {
   }
 
   async sendBulkVoiceCall(
+    tenantId: string,
     recipients: string[],
     message: string,
     options?: PhoneDeliveryOptions,
   ): Promise<void> {
     await this.phoneQueue.add(MAILER_PHONE_JOB_SEND_BULK_VOICE_CALL, {
+      tenantId,
       recipients,
       message,
       options,
@@ -45,11 +49,13 @@ export class PhoneUseCase implements IPhoneUseCase {
   }
 
   async sendBulkWhatsApp(
+    tenantId: string,
     recipients: string[],
     message: string,
     options?: PhoneDeliveryOptions,
   ): Promise<void> {
     await this.phoneQueue.add(MAILER_PHONE_JOB_SEND_BULK_WHATSAPP, {
+      tenantId,
       recipients,
       message,
       options,
@@ -57,11 +63,13 @@ export class PhoneUseCase implements IPhoneUseCase {
   }
 
   async sendSMS(
+    tenantId: string,
     to: string,
     message: string,
     options?: PhoneDeliveryOptions,
   ): Promise<void> {
     await this.phoneQueue.add(MAILER_PHONE_JOB_SEND_SMS, {
+      tenantId,
       to,
       message,
       options,
@@ -69,11 +77,13 @@ export class PhoneUseCase implements IPhoneUseCase {
   }
 
   async sendVoiceCall(
+    tenantId: string,
     to: string,
     message: string,
     options?: PhoneDeliveryOptions,
   ): Promise<void> {
     await this.phoneQueue.add(MAILER_PHONE_JOB_SEND_VOICE_CALL, {
+      tenantId,
       to,
       message,
       options,
@@ -81,11 +91,13 @@ export class PhoneUseCase implements IPhoneUseCase {
   }
 
   async sendWhatsApp(
+    tenantId: string,
     to: string,
     message: string,
     options?: PhoneDeliveryOptions,
   ): Promise<void> {
     await this.phoneQueue.add(MAILER_PHONE_JOB_SEND_WHATSAPP, {
+      tenantId,
       to,
       message,
       options,

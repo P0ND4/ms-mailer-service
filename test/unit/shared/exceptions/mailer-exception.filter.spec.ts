@@ -21,6 +21,7 @@ describe('FoodaExceptionFilter', () => {
 
     const host: ArgumentsHost = {
       switchToHttp: () => ({
+        getRequest: () => ({}),
         getResponse: () => response,
       }),
     } as unknown as ArgumentsHost;

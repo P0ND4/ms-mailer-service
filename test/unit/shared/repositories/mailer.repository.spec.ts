@@ -1,6 +1,8 @@
 import { RedisMailerRepository } from 'src/contexts/shared/infrastructure/repositories/mailer.repository';
 
 describe('RedisMailerRepository', () => {
+  const tenantId = 'tenant_abc';
+
   const createRedisMock = () => ({
     set: jest.fn().mockResolvedValue('OK'),
     get: jest.fn().mockResolvedValue('482913'),
@@ -14,11 +16,11 @@ describe('RedisMailerRepository', () => {
     const redis = createRedisMock();
     const repository = new RedisMailerRepository(redis as any);
 
-    await repository.saveVerificationCode('user:login:sms', '482913', 300);
-    const code = await repository.getVerificationCode('user:login:sms');
+    await repository.saveVerificationCode(tenantId, 'user:login:sms', '482913', 300);
+    const code = await repository.getVerificationCode(tenantId, 'user:login:sms');
 
     expect(redis.set).toHaveBeenCalledWith(
-      'verification:code:user:login:sms',
+      'tenant_abc:verification:code:user:login:sms',
       '482913',
       'EX',
       300,
@@ -30,9 +32,9 @@ describe('RedisMailerRepository', () => {
     const redis = createRedisMock();
     const repository = new RedisMailerRepository(redis as any);
 
-    await repository.deleteVerificationCode('user:login:sms');
+    await repository.deleteVerificationCode(tenantId, 'user:login:sms');
 
-    expect(redis.del).toHaveBeenCalledWith('verification:code:user:login:sms');
+    expect(redis.del).toHaveBeenCalledWith('tenant_abc:verification:code:user:login:sms');
   });
 
   it('returns ttl when verification code key has positive ttl', async () => {
@@ -40,7 +42,7 @@ describe('RedisMailerRepository', () => {
     redis.ttl.mockResolvedValue(45);
     const repository = new RedisMailerRepository(redis as any);
 
-    const ttl = await repository.getVerificationCodeTtl('user:login:sms');
+    const ttl = await repository.getVerificationCodeTtl(tenantId, 'user:login:sms');
 
     expect(ttl).toBe(45);
   });
@@ -50,7 +52,7 @@ describe('RedisMailerRepository', () => {
     redis.ttl.mockResolvedValue(-1);
     const repository = new RedisMailerRepository(redis as any);
 
-    const ttl = await repository.getVerificationCodeTtl('user:login:sms');
+    const ttl = await repository.getVerificationCodeTtl(tenantId, 'user:login:sms');
 
     expect(ttl).toBeNull();
   });
@@ -61,13 +63,14 @@ describe('RedisMailerRepository', () => {
     const repository = new RedisMailerRepository(redis as any);
 
     const attempts = await repository.incrementValidationAttempts(
+      tenantId,
       'user:login:sms',
       600,
     );
 
     expect(attempts).toBe(1);
     expect(redis.expire).toHaveBeenCalledWith(
-      'verification:code:attempts:user:login:sms',
+      'tenant_abc:verification:code:attempts:user:login:sms',
       600,
     );
   });
@@ -77,12 +80,12 @@ describe('RedisMailerRepository', () => {
     redis.incr.mockResolvedValueOnce(1).mockResolvedValueOnce(2);
     const repository = new RedisMailerRepository(redis as any);
 
-    await repository.incrementGenerationRequests('user:login:sms', 60);
-    await repository.incrementGenerationRequests('user:login:sms', 60);
+    await repository.incrementGenerationRequests(tenantId, 'user:login:sms', 60);
+    await repository.incrementGenerationRequests(tenantId, 'user:login:sms', 60);
 
     expect(redis.expire).toHaveBeenCalledTimes(1);
     expect(redis.expire).toHaveBeenCalledWith(
-      'verification:code:rate:user:login:sms',
+      'tenant_abc:verification:code:rate:user:login:sms',
       60,
     );
   });
@@ -92,12 +95,12 @@ describe('RedisMailerRepository', () => {
     redis.get.mockResolvedValue('3');
     const repository = new RedisMailerRepository(redis as any);
 
-    const attempts = await repository.getValidationAttempts('user:login:sms');
-    await repository.resetValidationAttempts('user:login:sms');
+    const attempts = await repository.getValidationAttempts(tenantId, 'user:login:sms');
+    await repository.resetValidationAttempts(tenantId, 'user:login:sms');
 
     expect(attempts).toBe(3);
     expect(redis.del).toHaveBeenCalledWith(
-      'verification:code:attempts:user:login:sms',
+      'tenant_abc:verification:code:attempts:user:login:sms',
     );
   });
 });

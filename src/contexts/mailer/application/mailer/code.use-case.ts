@@ -16,6 +16,7 @@ export class CodeUseCase implements ICodeUseCase {
   ) {}
 
   async generateCode(
+    tenantId: string,
     length: number,
     hash: string,
     ttlSeconds: number = 300,
@@ -31,13 +32,14 @@ export class CodeUseCase implements ICodeUseCase {
 
     const generationRequests =
       await this.mailerRepository.incrementGenerationRequests(
+        tenantId,
         hash,
         rateLimitWindow,
       );
 
     if (generationRequests > maxGenerateRequests) {
       this.logger.warn(
-        `[OTP_AUDIT] event=generate-blocked hash=${this.maskHash(hash)} reason=rate-limit requests=${generationRequests}`,
+        `[OTP_AUDIT] event=generate-blocked tenantId=${tenantId} hash=${this.maskHash(hash)} reason=rate-limit requests=${generationRequests}`,
       );
       throw new FoodaException(
         FoodaExceptionCodes.Ex3001,
@@ -50,17 +52,17 @@ export class CodeUseCase implements ICodeUseCase {
       randomInt(0, 10),
     ).join('');
 
-    await this.mailerRepository.saveVerificationCode(hash, code, ttlSeconds);
-    await this.mailerRepository.resetValidationAttempts(hash);
+    await this.mailerRepository.saveVerificationCode(tenantId, hash, code, ttlSeconds);
+    await this.mailerRepository.resetValidationAttempts(tenantId, hash);
 
     this.logger.log(
-      `[OTP_AUDIT] event=generated hash=${this.maskHash(hash)} ttl=${ttlSeconds}`,
+      `[OTP_AUDIT] event=generated tenantId=${tenantId} hash=${this.maskHash(hash)} ttl=${ttlSeconds}`,
     );
 
     return code;
   }
 
-  async validateCode(code: string, hash: string): Promise<boolean> {
+  async validateCode(tenantId: string, code: string, hash: string): Promise<boolean> {
     const maxValidateAttempts = this.getNumberEnv(
       'OTP_MAX_VALIDATE_ATTEMPTS',
       5,
@@ -71,11 +73,11 @@ export class CodeUseCase implements ICodeUseCase {
     );
 
     const existingAttempts =
-      await this.mailerRepository.getValidationAttempts(hash);
+      await this.mailerRepository.getValidationAttempts(tenantId, hash);
     if (existingAttempts >= maxValidateAttempts) {
-      await this.mailerRepository.deleteVerificationCode(hash);
+      await this.mailerRepository.deleteVerificationCode(tenantId, hash);
       this.logger.warn(
-        `[OTP_AUDIT] event=validate-blocked hash=${this.maskHash(hash)} reason=max-attempts attempts=${existingAttempts}`,
+        `[OTP_AUDIT] event=validate-blocked tenantId=${tenantId} hash=${this.maskHash(hash)} reason=max-attempts attempts=${existingAttempts}`,
       );
       throw new FoodaException(
         FoodaExceptionCodes.Ex3000,
@@ -83,27 +85,28 @@ export class CodeUseCase implements ICodeUseCase {
       );
     }
 
-    const storedCode = await this.mailerRepository.getVerificationCode(hash);
+    const storedCode = await this.mailerRepository.getVerificationCode(tenantId, hash);
     const isValid = storedCode === code;
 
     if (!isValid) {
       const codeTtlSeconds =
-        await this.mailerRepository.getVerificationCodeTtl(hash);
+        await this.mailerRepository.getVerificationCodeTtl(tenantId, hash);
       const attemptsTtlSeconds = codeTtlSeconds ?? fallbackAttemptsTtlSeconds;
 
       const attempts = await this.mailerRepository.incrementValidationAttempts(
+        tenantId,
         hash,
         attemptsTtlSeconds,
       );
 
       this.logger.warn(
-        `[OTP_AUDIT] event=validate-failed hash=${this.maskHash(hash)} attempts=${attempts}`,
+        `[OTP_AUDIT] event=validate-failed tenantId=${tenantId} hash=${this.maskHash(hash)} attempts=${attempts}`,
       );
 
       if (attempts >= maxValidateAttempts) {
-        await this.mailerRepository.deleteVerificationCode(hash);
+        await this.mailerRepository.deleteVerificationCode(tenantId, hash);
         this.logger.warn(
-          `[OTP_AUDIT] event=validate-blocked hash=${this.maskHash(hash)} reason=max-attempts attempts=${attempts}`,
+          `[OTP_AUDIT] event=validate-blocked tenantId=${tenantId} hash=${this.maskHash(hash)} reason=max-attempts attempts=${attempts}`,
         );
         throw new FoodaException(
           FoodaExceptionCodes.Ex3000,
@@ -114,11 +117,11 @@ export class CodeUseCase implements ICodeUseCase {
       return false;
     }
 
-    await this.mailerRepository.deleteVerificationCode(hash);
-    await this.mailerRepository.resetValidationAttempts(hash);
+    await this.mailerRepository.deleteVerificationCode(tenantId, hash);
+    await this.mailerRepository.resetValidationAttempts(tenantId, hash);
 
     this.logger.log(
-      `[OTP_AUDIT] event=validated hash=${this.maskHash(hash)} status=success`,
+      `[OTP_AUDIT] event=validated tenantId=${tenantId} hash=${this.maskHash(hash)} status=success`,
     );
 
     return true;

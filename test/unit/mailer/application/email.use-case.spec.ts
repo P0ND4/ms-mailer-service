@@ -9,11 +9,12 @@ describe('EmailUseCase', () => {
     const queue = { add: jest.fn().mockResolvedValue(undefined) };
     const useCase = new EmailUseCase(queue as any);
 
-    await useCase.sendEmail('user@company.com', 'Subject', 'Body', {
+    await useCase.sendEmail('tenant_abc', 'user@company.com', 'Subject', 'Body', {
       from: 'noreply@company.com',
     });
 
     expect(queue.add).toHaveBeenCalledWith(MAILER_EMAIL_JOB_SEND, {
+      tenantId: 'tenant_abc',
       to: 'user@company.com',
       subject: 'Subject',
       body: 'Body',
@@ -26,6 +27,7 @@ describe('EmailUseCase', () => {
     const useCase = new EmailUseCase(queue as any);
 
     await useCase.sendBulkEmail(
+      'tenant_abc',
       ['a@company.com', 'b@company.com'],
       'Subject',
       'Body',
@@ -33,6 +35,7 @@ describe('EmailUseCase', () => {
     );
 
     expect(queue.add).toHaveBeenCalledWith(MAILER_EMAIL_JOB_SEND_BULK, {
+      tenantId: 'tenant_abc',
       recipients: ['a@company.com', 'b@company.com'],
       subject: 'Subject',
       body: 'Body',

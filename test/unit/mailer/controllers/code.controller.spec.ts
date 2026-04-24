@@ -14,13 +14,14 @@ describe('CodeController', () => {
     codeService.generateCode.mockResolvedValueOnce('482913');
     const controller = new CodeController(codeService as any);
 
-    const response = await controller.generateCode({
+    const response = await controller.generateCode('tenant_abc', {
       hash: 'user1:login:sms:tenant1',
       length: 6,
       ttlSeconds: 120,
     });
 
     expect(codeService.generateCode).toHaveBeenCalledWith(
+      'tenant_abc',
       6,
       'user1:login:sms:tenant1',
       120,
@@ -37,12 +38,13 @@ describe('CodeController', () => {
     codeService.generateCode.mockResolvedValueOnce('9999');
     const controller = new CodeController(codeService as any);
 
-    const response = await controller.generateCode({
+    const response = await controller.generateCode('tenant_abc', {
       hash: 'user1:login:sms',
       length: 4,
     });
 
     expect(codeService.generateCode).toHaveBeenCalledWith(
+      'tenant_abc',
       4,
       'user1:login:sms',
       300,
@@ -54,12 +56,13 @@ describe('CodeController', () => {
     codeService.validateCode.mockResolvedValueOnce(true);
     const controller = new CodeController(codeService as any);
 
-    const response = await controller.validateCode({
+    const response = await controller.validateCode('tenant_abc', {
       code: '482913',
       hash: 'user1:login:sms:tenant1',
     });
 
     expect(codeService.validateCode).toHaveBeenCalledWith(
+      'tenant_abc',
       '482913',
       'user1:login:sms:tenant1',
     );

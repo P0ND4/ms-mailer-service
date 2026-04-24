@@ -1,7 +1,8 @@
-import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import { Body, Controller, Headers, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiBody,
+  ApiHeader,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
@@ -14,6 +15,12 @@ import { GenerateCodeDto } from '../dtos/generate-code.dto';
 import { ValidateCodeDto } from '../dtos/validate-code.dto';
 
 @ApiTags('Mailer Code')
+@ApiHeader({
+  name: 'x-tenant-id',
+  required: true,
+  description: 'Identificador del tenant (schema de la base de datos)',
+  example: 'tenant_abc',
+})
 @Controller(`${V1_MAILER}/code`)
 export class CodeController {
   constructor(private readonly codeService: ICodeUseCase) {}
@@ -51,9 +58,13 @@ export class CodeController {
     description:
       'Se excedio el limite de solicitudes para generar codigos. Posible codigo: ML-3001.',
   })
-  async generateCode(@Body() body: GenerateCodeDto) {
+  async generateCode(
+    @Headers('x-tenant-id') tenantId: string,
+    @Body() body: GenerateCodeDto,
+  ) {
     const ttlSeconds = body.ttlSeconds ?? 300;
     const code = await this.codeService.generateCode(
+      tenantId,
       body.length,
       body.hash,
       ttlSeconds,
@@ -106,8 +117,11 @@ export class CodeController {
     description:
       'Se excedio el limite de intentos de validacion. Posible codigo: ML-3000.',
   })
-  async validateCode(@Body() body: ValidateCodeDto) {
-    const valid = await this.codeService.validateCode(body.code, body.hash);
+  async validateCode(
+    @Headers('x-tenant-id') tenantId: string,
+    @Body() body: ValidateCodeDto,
+  ) {
+    const valid = await this.codeService.validateCode(tenantId, body.code, body.hash);
     return {
       valid,
     };

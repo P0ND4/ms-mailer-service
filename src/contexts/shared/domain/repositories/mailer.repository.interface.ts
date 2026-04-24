@@ -1,26 +1,29 @@
 export abstract class IMailerRepository {
   abstract saveVerificationCode(
+    tenantId: string,
     hash: string,
     code: string,
     ttlSeconds: number,
   ): Promise<void>;
 
-  abstract getVerificationCode(hash: string): Promise<string | null>;
+  abstract getVerificationCode(tenantId: string, hash: string): Promise<string | null>;
 
-  abstract getVerificationCodeTtl(hash: string): Promise<number | null>;
+  abstract getVerificationCodeTtl(tenantId: string, hash: string): Promise<number | null>;
 
-  abstract deleteVerificationCode(hash: string): Promise<void>;
+  abstract deleteVerificationCode(tenantId: string, hash: string): Promise<void>;
 
-  abstract getValidationAttempts(hash: string): Promise<number>;
+  abstract getValidationAttempts(tenantId: string, hash: string): Promise<number>;
 
   abstract incrementValidationAttempts(
+    tenantId: string,
     hash: string,
     ttlSeconds: number,
   ): Promise<number>;
 
-  abstract resetValidationAttempts(hash: string): Promise<void>;
+  abstract resetValidationAttempts(tenantId: string, hash: string): Promise<void>;
 
   abstract incrementGenerationRequests(
+    tenantId: string,
     hash: string,
     windowSeconds: number,
   ): Promise<number>;

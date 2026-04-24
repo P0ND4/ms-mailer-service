@@ -15,10 +15,11 @@ describe('PhoneUseCase', () => {
     const queue = createQueue();
     const useCase = new PhoneUseCase(queue as any);
 
-    await useCase.sendSMS('+1234567890', 'hello', { from: '+1987654321' });
-    await useCase.sendBulkSMS(['+123', '+456'], 'hello');
+    await useCase.sendSMS('tenant_abc', '+1234567890', 'hello', { from: '+1987654321' });
+    await useCase.sendBulkSMS('tenant_abc', ['+123', '+456'], 'hello');
 
     expect(queue.add).toHaveBeenNthCalledWith(1, MAILER_PHONE_JOB_SEND_SMS, {
+      tenantId: 'tenant_abc',
       to: '+1234567890',
       message: 'hello',
       options: { from: '+1987654321' },
@@ -27,6 +28,7 @@ describe('PhoneUseCase', () => {
       2,
       MAILER_PHONE_JOB_SEND_BULK_SMS,
       {
+        tenantId: 'tenant_abc',
         recipients: ['+123', '+456'],
         message: 'hello',
         options: undefined,
@@ -38,15 +40,16 @@ describe('PhoneUseCase', () => {
     const queue = createQueue();
     const useCase = new PhoneUseCase(queue as any);
 
-    await useCase.sendWhatsApp('+1234567890', 'wa', {
+    await useCase.sendWhatsApp('tenant_abc', '+1234567890', 'wa', {
       messagingServiceSid: 'MG123',
     });
-    await useCase.sendBulkWhatsApp(['+123', '+456'], 'wa');
+    await useCase.sendBulkWhatsApp('tenant_abc', ['+123', '+456'], 'wa');
 
     expect(queue.add).toHaveBeenNthCalledWith(
       1,
       MAILER_PHONE_JOB_SEND_WHATSAPP,
       {
+        tenantId: 'tenant_abc',
         to: '+1234567890',
         message: 'wa',
         options: { messagingServiceSid: 'MG123' },
@@ -56,6 +59,7 @@ describe('PhoneUseCase', () => {
       2,
       MAILER_PHONE_JOB_SEND_BULK_WHATSAPP,
       {
+        tenantId: 'tenant_abc',
         recipients: ['+123', '+456'],
         message: 'wa',
         options: undefined,
@@ -67,15 +71,16 @@ describe('PhoneUseCase', () => {
     const queue = createQueue();
     const useCase = new PhoneUseCase(queue as any);
 
-    await useCase.sendVoiceCall('+1234567890', 'voice', {
+    await useCase.sendVoiceCall('tenant_abc', '+1234567890', 'voice', {
       voiceUrl: 'https://voice.example.com/twiml',
     });
-    await useCase.sendBulkVoiceCall(['+123', '+456'], 'voice');
+    await useCase.sendBulkVoiceCall('tenant_abc', ['+123', '+456'], 'voice');
 
     expect(queue.add).toHaveBeenNthCalledWith(
       1,
       MAILER_PHONE_JOB_SEND_VOICE_CALL,
       {
+        tenantId: 'tenant_abc',
         to: '+1234567890',
         message: 'voice',
         options: { voiceUrl: 'https://voice.example.com/twiml' },
@@ -85,6 +90,7 @@ describe('PhoneUseCase', () => {
       2,
       MAILER_PHONE_JOB_SEND_BULK_VOICE_CALL,
       {
+        tenantId: 'tenant_abc',
         recipients: ['+123', '+456'],
         message: 'voice',
         options: undefined,

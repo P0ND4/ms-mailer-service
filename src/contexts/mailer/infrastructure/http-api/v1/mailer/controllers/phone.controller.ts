@@ -1,4 +1,11 @@
-import { Body, Controller, Headers, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Headers,
+  HttpCode,
+  HttpStatus,
+  Post,
+} from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiBody,
@@ -64,7 +71,12 @@ export class PhoneController {
     @Headers('x-tenant-id') tenantId: string,
     @Body() body: SendPhoneMessageDto,
   ) {
-    await this.phoneUseCase.sendSMS(tenantId, body.to, body.message, body.options);
+    await this.phoneUseCase.sendSMS(
+      tenantId,
+      body.to,
+      body.message,
+      body.options,
+    );
     return {
       sent: true,
       channel: 'phone',
@@ -154,7 +166,12 @@ export class PhoneController {
     @Headers('x-tenant-id') tenantId: string,
     @Body() body: SendPhoneMessageDto,
   ) {
-    await this.phoneUseCase.sendWhatsApp(tenantId, body.to, body.message, body.options);
+    await this.phoneUseCase.sendWhatsApp(
+      tenantId,
+      body.to,
+      body.message,
+      body.options,
+    );
     return {
       sent: true,
       channel: 'phone',
@@ -245,7 +262,12 @@ export class PhoneController {
     @Headers('x-tenant-id') tenantId: string,
     @Body() body: SendPhoneMessageDto,
   ) {
-    await this.phoneUseCase.sendVoiceCall(tenantId, body.to, body.message, body.options);
+    await this.phoneUseCase.sendVoiceCall(
+      tenantId,
+      body.to,
+      body.message,
+      body.options,
+    );
     return {
       sent: true,
       channel: 'phone',

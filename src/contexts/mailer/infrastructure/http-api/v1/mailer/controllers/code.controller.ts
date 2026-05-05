@@ -1,4 +1,11 @@
-import { Body, Controller, Headers, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Headers,
+  HttpCode,
+  HttpStatus,
+  Post,
+} from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiBody,
@@ -121,7 +128,11 @@ export class CodeController {
     @Headers('x-tenant-id') tenantId: string,
     @Body() body: ValidateCodeDto,
   ) {
-    const valid = await this.codeService.validateCode(tenantId, body.code, body.hash);
+    const valid = await this.codeService.validateCode(
+      tenantId,
+      body.code,
+      body.hash,
+    );
     return {
       valid,
     };

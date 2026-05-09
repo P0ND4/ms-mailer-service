@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Post,
 } from '@nestjs/common';
+import { SkipResponseWrapper } from 'src/contexts/shared/decorators/skip-response-wrapper.decorator';
 import {
   ApiBadRequestResponse,
   ApiBody,
@@ -22,6 +23,7 @@ import { GenerateCodeDto } from '../dtos/generate-code.dto';
 import { ValidateCodeDto } from '../dtos/validate-code.dto';
 
 @ApiTags('Mailer Code')
+@SkipResponseWrapper()
 @ApiHeader({
   name: 'x-tenant-id',
   required: true,

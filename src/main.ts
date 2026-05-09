@@ -5,6 +5,7 @@ import { CustomValidationPipe } from './contexts/shared/domain/exceptions/custom
 import { FoodaExceptionFilter } from './contexts/shared/domain/exceptions/mailer-exception.filter';
 import { ApiResponseInterceptor } from './contexts/shared/interceptors/api.response.interceptor';
 import { Logger } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
@@ -49,7 +50,7 @@ async function bootstrap() {
 
   app.useGlobalPipes(new CustomValidationPipe());
   app.useGlobalFilters(new FoodaExceptionFilter());
-  app.useGlobalInterceptors(new ApiResponseInterceptor());
+  app.useGlobalInterceptors(new ApiResponseInterceptor(app.get(Reflector)));
 
   await app.listen(port);
 }

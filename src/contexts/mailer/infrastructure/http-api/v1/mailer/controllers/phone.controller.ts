@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Post,
 } from '@nestjs/common';
+import { SkipResponseWrapper } from 'src/contexts/shared/decorators/skip-response-wrapper.decorator';
 import {
   ApiBadRequestResponse,
   ApiBody,
@@ -20,6 +21,7 @@ import { SendPhoneMessageDto } from '../dtos/send-phone-message.dto';
 import { SendBulkPhoneMessageDto } from '../dtos/send-bulk-phone-message.dto';
 
 @ApiTags('Mailer Phone')
+@SkipResponseWrapper()
 @ApiHeader({
   name: 'x-tenant-id',
   required: true,
